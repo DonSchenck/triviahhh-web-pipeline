@@ -1,0 +1,12 @@
+apiVersion: triggers.tekton.dev/v1alpha1
+kind: EventListener
+metadata:
+  name: triviahhh-web-app
+spec:
+  serviceAccountName: pipeline
+  triggers:
+    - name: triviahhh-web-app
+      bindings:
+        - ref: triviahhh-web-app
+      template:
+        name: triviahhh-web-app

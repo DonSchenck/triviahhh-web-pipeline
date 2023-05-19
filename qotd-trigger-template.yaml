@@ -1,0 +1,35 @@
+
+apiVersion: triggers.tekton.dev/v1alpha1
+kind: TriggerTemplate
+metadata:
+  name: triviahhh-web-app
+spec:
+  params:
+  - name: triviahhh-web-git
+    description: The git repository url
+  - name: git-repo-name
+    description: The name of the deployment to be created / patched
+  resourcetemplates:
+  - apiVersion: tekton.dev/v1beta1
+    kind: PipelineRun
+    metadata:
+      name: triviahhh-web-build-and-deploy-$(uid)
+    spec:
+      serviceAccountName: pipeline
+      pipelineRef:
+        name: triviahhh-web-build-and-deploy
+      workspaces:
+      - name: output
+        volumeClaimTemplate:
+          spec:
+            accessModes:
+            - ReadWriteOnce
+            resources:
+              requests:
+                storage: 900Mi
+      params:
+      - name: triviahhh-web-git
+        value: $(params.triviahhh-web-git)
+      - name: triviahhh-web-image
+        value: image-registry.openshift-image-registry.svc:5000/trigger-demo/$(params.git-repo-name):latest
+        

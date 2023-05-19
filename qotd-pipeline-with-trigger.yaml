@@ -1,0 +1,49 @@
+apiVersion: tekton.dev/v1beta1
+kind: Pipeline
+metadata:
+  name: triviahhh-web-build-and-deploy
+spec:
+  params:
+    - name: triviahhh-web-git
+      description: URL of git repository containing source code to be built
+    - name: triviahhh-web-image
+      description: URL of container image to be built, i.e. output path
+  workspaces:
+  - name: output
+    description: |
+      This workspace will receive the cloned git repo and be passed
+      to the next Task
+  tasks:
+    - name: clone-repo
+      taskRef: 
+        name: git-clone
+        kind: ClusterTask
+      params:
+        - name: url
+          value: $(params.triviahhh-web-git)
+      workspaces:
+      - name: output
+        workspace: output
+    - name: image-build
+      taskRef:
+        name: buildah
+      params:
+        - name: IMAGE
+          value: $(params.triviahhh-web-image)
+        - name: TLSVERIFY
+          value: "false"
+        - name: CONTEXT
+          value: "."
+      workspaces:
+      - name: source
+        workspace: output
+      runAfter:
+        - clone-repo
+    - name: apply-manifests
+      taskRef:
+        name: apply-manifests-for-triggers
+      workspaces:
+      - name: source
+        workspace: output
+      runAfter:
+        - image-build

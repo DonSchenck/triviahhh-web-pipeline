@@ -1,0 +1,11 @@
+apiVersion: triggers.tekton.dev/v1alpha1
+kind: TriggerBinding
+metadata:
+  name: triviahhh-web-app
+spec:
+  params:
+  - name: triviahhh-web-git
+    value: $(body.repository.clone_url)
+  - name: git-repo-name
+    value: $(body.repository.name)
+    

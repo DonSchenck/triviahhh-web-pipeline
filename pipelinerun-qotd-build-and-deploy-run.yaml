@@ -1,0 +1,22 @@
+﻿apiVersion: tekton.dev/v1beta1
+kind: PipelineRun
+metadata:
+  generateName: triviahhh-web-build-and-deploy-pipelinerun-
+spec:
+  params:
+    - name: IMAGE
+      value: >-
+        image-registry.openshift-image-registry.svc:5000/pipelines-tutorial/triviahhh-web:latest
+    - name: git-url
+      value: 'https://github.com/redhat-developer-demos/triviahhh-web.git'
+  pipelineRef:
+    name: triviahhh-web-build-and-deploy
+  workspaces: 
+  - name: shared-workspace
+    volumeClaimTemplate:
+      spec:
+        accessModes:
+          - ReadWriteOnce
+        resources:
+          requests:
+            storage: 500Mi
